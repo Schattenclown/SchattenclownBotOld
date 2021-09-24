@@ -18,17 +18,17 @@ namespace SchattenclownBot.Model.Objects
         public ulong MemberId { get; set; }
         public static void Add(ScTimer timer)
         {
-            DB_Timer.Add(timer);
+            DB_ScTimer.Add(timer);
             dbot.TimerDBRefresh();
         }
         public static void Delete(ScTimer timer)
         {
-            DB_Timer.Delete(timer);
+            DB_ScTimer.Delete(timer);
             dbot.TimerDBRefresh();
         }
         public static List<ScTimer> ReadAll()
         {
-            return DB_Timer.ReadAll();
+            return DB_ScTimer.ReadAll();
         }
     }
 }

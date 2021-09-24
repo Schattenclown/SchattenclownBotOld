@@ -8,7 +8,7 @@ using SchattenclownBot.HelpClasses;
 
 namespace SchattenclownBot.Model.Persistence
 {
-    public class DB_Timer
+    public class DB_ScTimer
     {
         public static List<ScTimer> ReadAll()
         {

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using SchattenclownBot.Model.Discord.ChoiceProvider;
 using SchattenclownBot.Model.Objects;
+using SchattenclownBot.Model.Persistence;
 
 namespace SchattenclownBot.Model.Discord.Interaction
 {
@@ -32,7 +33,8 @@ namespace SchattenclownBot.Model.Discord.Interaction
                 Color = new DiscordColor(245, 107, 0)
             };
             eb.AddField("/invite", "Send´s an invite link!");
-            eb.AddField("/Timer", "Set´s a Timer!");
+            eb.AddField("timer", "Set´s a timer!");
+            eb.AddField("mytimers", "Look up your timers!");
             eb.WithAuthor("Schattenclown help");
             eb.WithFooter("(✿◠‿◠) thanks for using me");
             eb.WithTimestamp(DateTime.Now);
@@ -40,7 +42,7 @@ namespace SchattenclownBot.Model.Discord.Interaction
             await ic.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(eb.Build()));
         }
 
-        [SlashCommand("timer", "Set a timer", true)]
+        [SlashCommand("timer", "Set a timer!", true)]
         public static async Task Timer(InteractionContext ic, [ChoiceProvider(typeof(HoursChoiceProvider))][Option("HOURS", "HOURS")] string hours, [ChoiceProvider(typeof(MinutesChoiceProvider))][Option("MINUTES", "MINUTES")] string minutes)
         {
             await ic.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Creating Timer..."));
@@ -63,10 +65,35 @@ namespace SchattenclownBot.Model.Discord.Interaction
 
             int addMinutes = Convert.ToInt32(minutesChoices.First(c => c.Value.ToString() == minutes).Name);
             timer.NotificationTime = timer.NotificationTime.AddMinutes(addMinutes);
-                   
+
             ScTimer.Add(timer);
 
             await ic.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Timer set for {timer.NotificationTime}!"));
+        }
+
+        [SlashCommand("mytimers", "Look up your timers!", true)]
+        public static async Task TimerLookup(InteractionContext ic)
+        {
+            List<ScTimer> lstScTimers = DB_ScTimer.ReadAll();
+            DiscordEmbedBuilder eb = new DiscordEmbedBuilder
+            {
+                Title = "Your Timers",
+                Color = DiscordColor.Azure,
+                Description = $"<@{ic.Member.Id}>"
+            };
+            bool noTimers = true;
+            foreach (var scTimer in lstScTimers)
+            {
+                if (scTimer.MemberId == ic.Member.Id)
+                {
+                    noTimers = false;
+                    eb.AddField($"{scTimer.NotificationTime}", "Timer set for");
+                }
+            }
+            if (noTimers)
+                eb.Title = "No Timers set!";
+
+            await ic.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AddEmbed(eb.Build()));
         }
 
         /// <summary>

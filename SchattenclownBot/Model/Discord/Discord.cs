@@ -199,8 +199,8 @@ namespace SchattenclownBot.Model.Discord
 
         public async Task TimerRunAsync()
         {
-            scTimers = DB_Timer.ReadAll();
-            
+            scTimers = DB_ScTimer.ReadAll();
+            TimerDBRefreshInterval();
             while (true)
             {
                 DateTime dateTimeNow = DateTime.Now;
@@ -223,7 +223,12 @@ namespace SchattenclownBot.Model.Discord
         }
         public void TimerDBRefresh()
         {
-            scTimers = DB_Timer.ReadAll();
+            scTimers = DB_ScTimer.ReadAll();
+        }
+        public async Task TimerDBRefreshInterval()
+        {
+            scTimers = DB_ScTimer.ReadAll();
+            await Task.Delay(1000 * 60 * 5);
         }
 
         #region Register Commands & Events
