@@ -1,1 +1,3 @@
-*.vs
+*.vs*
+*SchattenclownBot/bin/Debug/*
+*SchattenclownBot/obj/Release/*
