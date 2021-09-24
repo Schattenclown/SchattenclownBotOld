@@ -66,7 +66,7 @@ namespace SchattenclownBot.Model.Discord.Interaction
                    
             ScTimer.Add(timer);
 
-            await ic.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Timer set!"));
+            await ic.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Timer set for {timer.NotificationTime}!"));
         }
 
         /// <summary>
