@@ -8,13 +8,13 @@ using SchattenclownBot.HelpClasses;
 
 namespace SchattenclownBot.Model.Persistence
 {
-    public class DB_ScTimer
+    public class DB_ScTimers
     {
         public static List<ScTimer> ReadAll()
         {
-            string sql = "SELECT * FROM Timer";
+            string sql = "SELECT * FROM ScTimers";
 
-            List<ScTimer> lstTimer = new List<ScTimer>();
+            List<ScTimer> lstScTimers = new List<ScTimer>();
             MySqlConnection connection = DB_Connection.OpenDB();
             MySqlDataReader dataReader = DB_Connection.ExecuteReader(sql, connection);
 
@@ -22,31 +22,31 @@ namespace SchattenclownBot.Model.Persistence
             {
                 while (dataReader.Read())
                 {
-                    ScTimer timer = new ScTimer
+                    ScTimer scTimer = new ScTimer
                     {
                         DBEntryID = dataReader.GetInt32("DBEntryID"),
                         NotificationTime = dataReader.GetDateTime("NotificationTime"),
                         ChannelId = dataReader.GetUInt64("ChannelId"),
                         MemberId = dataReader.GetUInt64("MemberId")
                     };
-                    lstTimer.Add(timer);
+                    lstScTimers.Add(scTimer);
                 }
             }
 
-            return lstTimer;
+            return lstScTimers;
         }
-        public static void Add(ScTimer timer)
+        public static void Add(ScTimer scTimer)
         {
-            string sql = $"INSERT INTO Timer (NotificationTime, ChannelId, MemberId) " +
-                         $"VALUES ('{timer.NotificationTime:yyyy-MM-dd HH:mm:ss}', {timer.ChannelId}, {timer.MemberId})";
+            string sql = $"INSERT INTO ScTimers (NotificationTime, ChannelId, MemberId) " +
+                         $"VALUES ('{scTimer.NotificationTime:yyyy-MM-dd HH:mm:ss}', {scTimer.ChannelId}, {scTimer.MemberId})";
             DB_Connection.ExecuteNonQuery(sql);
         }
         public static void Delete(ScTimer scTimer)
         {
-            string sql = $"DELETE FROM Timer WHERE `DBEntryID` = '{scTimer.DBEntryID}'";
+            string sql = $"DELETE FROM ScTimers WHERE `DBEntryID` = '{scTimer.DBEntryID}'";
             DB_Connection.ExecuteNonQuery(sql);
         }
-        public static void CreateTable_Timer()
+        public static void CreateTable_ScTimers()
         {
             CSV_Connections cSV_Connections = new CSV_Connections();
             Connections cons = new Connections();
@@ -60,7 +60,7 @@ namespace SchattenclownBot.Model.Persistence
 
             string sql = $"CREATE DATABASE IF NOT EXISTS `{database}`;" +
                          $"USE `{database}`;" +
-                          "CREATE TABLE IF NOT EXISTS `Timer` (" +
+                          "CREATE TABLE IF NOT EXISTS `ScTimers` (" +
                           "`DBEntryID` int(12) NOT NULL AUTO_INCREMENT," +
                           "`NotificationTime` DATETIME NOT NULL," +
                           "`ChannelId` bigint(20) NOT NULL," +

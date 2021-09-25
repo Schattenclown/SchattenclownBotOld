@@ -82,6 +82,7 @@ namespace SchattenclownBot.Model.Discord
         public static int virgin = 0;
         public static DiscordClient Client { get; internal set; }
         public static List<ScTimer> scTimers;
+        public static List<ScAlarmClock> scAlarmClocks;
         public static ApplicationCommandsExtension ApplicationCommands { get; internal set; }
         public static CommandsNextExtension CNext { get; internal set; }
         public static InteractivityExtension INext { get; internal set; }
@@ -186,7 +187,9 @@ namespace SchattenclownBot.Model.Discord
             Console.WriteLine($"Starting with Prefix {prefix}");
             Console.WriteLine($"Starting {Client.CurrentUser.Username}");
 
-            TimerRunAsync();
+            ScTimersRunAsync();
+            ScAlarmClocksRunAsync();
+
             while (!ShutdownRequest.IsCancellationRequested)
             {
                 await Task.Delay(2000);
@@ -197,10 +200,10 @@ namespace SchattenclownBot.Model.Discord
             Dispose();
         }
 
-        public async Task TimerRunAsync()
+        public async Task ScTimersRunAsync()
         {
-            scTimers = DB_ScTimer.ReadAll();
-            TimerDBRefreshInterval();
+            scTimers = DB_ScTimers.ReadAll();
+            ScTimersDBRefreshAutoInterval();
             while (true)
             {
                 DateTime dateTimeNow = DateTime.Now;
@@ -215,19 +218,61 @@ namespace SchattenclownBot.Model.Discord
                         eb.WithDescription($"<@{scTimer.MemberId}> Timer for {scTimer.NotificationTime} is up!");
 
                         ScTimer.Delete(scTimer);
-                        await chn.SendMessageAsync(eb.Build());
+                        for (int i = 0; i < 3; i++)
+                        {
+                            await chn.SendMessageAsync(eb.Build());
+                            await Task.Delay(50);
+                        }
                     }
                 }
                 await Task.Delay(1000 * 1);
             }
         }
-        public void TimerDBRefresh()
+        public void ScTimersDBRefresh()
         {
-            scTimers = DB_ScTimer.ReadAll();
+            scTimers = DB_ScTimers.ReadAll();
         }
-        public async Task TimerDBRefreshInterval()
+        public async Task ScTimersDBRefreshAutoInterval()
         {
-            scTimers = DB_ScTimer.ReadAll();
+            scTimers = DB_ScTimers.ReadAll();
+            await Task.Delay(1000 * 60 * 5);
+        }
+        public async Task ScAlarmClocksRunAsync()
+        {
+            scAlarmClocks = DB_ScAlarmClocks.ReadAll();
+            ScTimersDBRefreshAutoInterval();
+
+            while (true)
+            {
+                DateTime dateTimeNow = DateTime.Now;
+
+                foreach (var scAlarmClock in scAlarmClocks)
+                {
+                    if (scAlarmClock.NotificationTime < dateTimeNow)
+                    {
+                        var chn = await Client.GetChannelAsync(scAlarmClock.ChannelId);
+                        DiscordEmbedBuilder eb = new DiscordEmbedBuilder();
+                        eb.Color = DiscordColor.Red;
+                        eb.WithDescription($"<@{scAlarmClock.MemberId}> Alarm for {scAlarmClock.NotificationTime} rings!");
+
+                        ScAlarmClock.Delete(scAlarmClock);
+                        for (int i = 0; i < 3; i++)
+                        {
+                            await chn.SendMessageAsync(eb.Build());
+                            await Task.Delay(50);
+                        }
+                    }
+                }
+                await Task.Delay(1000 * 1);
+            }
+        }
+        public void ScAlarmClocksDBRefresh()
+        {
+            scAlarmClocks = DB_ScAlarmClocks.ReadAll();
+        }
+        public async Task ScAlarmClocksDBRefreshAutoInterval()
+        {
+            ScAlarmClocksDBRefresh();
             await Task.Delay(1000 * 60 * 5);
         }
 

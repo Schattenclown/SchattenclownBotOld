@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SchattenclownBot.Model.Discord.ChoiceProvider;
 using SchattenclownBot.Model.Objects;
 using SchattenclownBot.Model.Persistence;
 
@@ -33,8 +32,10 @@ namespace SchattenclownBot.Model.Discord.Interaction
                 Color = new DiscordColor(245, 107, 0)
             };
             eb.AddField("/invite", "Send´s an invite link!");
-            eb.AddField("timer", "Set´s a timer!");
-            eb.AddField("mytimers", "Look up your timers!");
+            eb.AddField("/timer", "Set´s a timer!");
+            eb.AddField("/mytimers", "Look up your timers!");
+            eb.AddField("/alarmclock", "Set an alarm for a spesific time!");
+            eb.AddField("/myalarms", "Look up your alarms!");
             eb.WithAuthor("Schattenclown help");
             eb.WithFooter("(✿◠‿◠) thanks for using me");
             eb.WithTimestamp(DateTime.Now);
@@ -42,42 +43,87 @@ namespace SchattenclownBot.Model.Discord.Interaction
             await ic.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(eb.Build()));
         }
 
-        [SlashCommand("timer", "Set a timer!", true)]
-        public static async Task Timer(InteractionContext ic, [ChoiceProvider(typeof(HoursChoiceProvider))][Option("HOURS", "HOURS")] string hours, [ChoiceProvider(typeof(MinutesChoiceProvider))][Option("MINUTES", "MINUTES")] string minutes)
+        [SlashCommand("alarmclock", "Set an alarm for a spesific time!", true)]
+        public static async Task AlarmClock(InteractionContext ic, [Option("hourofday", "0-23")] double hour, [Option("minuteofday", "0-59")] double minute)
         {
-            await ic.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Creating Timer..."));
+            await ic.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Creating alarm..."));
 
-            var hoursChoiceProdiver = new HoursChoiceProvider();
-            var hoursChoices = await hoursChoiceProdiver.Provider();
-
-            var minutesChoiceProvider = new MinutesChoiceProvider();
-            var minutesChoices = await minutesChoiceProvider.Provider();
+            if (!TimeFormat(hour, minute))
+            {
+                await ic.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Wrong format for hour or minute!"));
+                return;
+            }
 
             DateTime dateTimeNow = DateTime.Now;
-            ScTimer timer = new ScTimer
+            DateTime alarm = new DateTime(dateTimeNow.Year, dateTimeNow.Month, dateTimeNow.Day, Convert.ToInt32(hour), Convert.ToInt32(minute), 0);
+
+            if (alarm < DateTime.Now)
+                alarm = alarm.AddDays(1);
+
+            ScAlarmClock scAlarmClock = new ScAlarmClock
             {
                 ChannelId = ic.Channel.Id,
-                MemberId = ic.Member.Id
+                MemberId = ic.Member.Id,
+                NotificationTime = alarm
             };
+            ScAlarmClock.Add(scAlarmClock);
+            await ic.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Alarm set for {scAlarmClock.NotificationTime}!"));
+        }
+        [SlashCommand("myalarms", "Look up your alarms!", true)]
+        public static async Task AlarmClockLookup(InteractionContext ic)
+        {
+            List<ScAlarmClock> lstScAlarmClocks = DB_ScAlarmClocks.ReadAll();
+            DiscordEmbedBuilder eb = new DiscordEmbedBuilder
+            {
+                Title = "Your alarms",
+                Color = DiscordColor.Azure,
+                Description = $"<@{ic.Member.Id}>"
+            };
+            bool noTimers = true;
+            foreach (var scAlarmClock in lstScAlarmClocks)
+            {
+                if (scAlarmClock.MemberId == ic.Member.Id)
+                {
+                    noTimers = false;
+                    eb.AddField($"{scAlarmClock.NotificationTime}", $"Alarm with ID {scAlarmClock.DBEntryID}");
+                }
+            }
+            if (noTimers)
+                eb.Title = "No alarms set!";
 
-            int addHours = Convert.ToInt32(hoursChoices.First(c => c.Value.ToString() == hours).Name);
-            timer.NotificationTime = dateTimeNow.AddHours(addHours);
+            await ic.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AddEmbed(eb.Build()));
+        }
 
-            int addMinutes = Convert.ToInt32(minutesChoices.First(c => c.Value.ToString() == minutes).Name);
-            timer.NotificationTime = timer.NotificationTime.AddMinutes(addMinutes);
+        [SlashCommand("timer", "Set a timer!", true)]
+        public static async Task Timer(InteractionContext ic, [Option("hours", "0-23")] double hour, [Option("minutes", "0-59")] double minute)
+        {
+            await ic.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Creating timer..."));
 
-            ScTimer.Add(timer);
+            if (!TimeFormat(hour, minute))
+            {
+                await ic.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Wrong format for hour or minute!"));
+                return;
+            }
 
-            await ic.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Timer set for {timer.NotificationTime}!"));
+            DateTime dateTimeNow = DateTime.Now;
+            ScTimer scTimer = new ScTimer
+            {
+                ChannelId = ic.Channel.Id,
+                MemberId = ic.Member.Id,
+                NotificationTime = dateTimeNow.AddHours(hour).AddMinutes(minute)
+            };
+            ScTimer.Add(scTimer);
+
+            await ic.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Timer set for {scTimer.NotificationTime}!"));
         }
 
         [SlashCommand("mytimers", "Look up your timers!", true)]
         public static async Task TimerLookup(InteractionContext ic)
         {
-            List<ScTimer> lstScTimers = DB_ScTimer.ReadAll();
+            List<ScTimer> lstScTimers = DB_ScTimers.ReadAll();
             DiscordEmbedBuilder eb = new DiscordEmbedBuilder
             {
-                Title = "Your Timers",
+                Title = "Your timers",
                 Color = DiscordColor.Azure,
                 Description = $"<@{ic.Member.Id}>"
             };
@@ -87,13 +133,45 @@ namespace SchattenclownBot.Model.Discord.Interaction
                 if (scTimer.MemberId == ic.Member.Id)
                 {
                     noTimers = false;
-                    eb.AddField($"{scTimer.NotificationTime}", "Timer set for");
+                    eb.AddField($"{scTimer.NotificationTime}", $"Timer with ID {scTimer.DBEntryID}");
                 }
             }
             if (noTimers)
-                eb.Title = "No Timers set!";
+                eb.Title = "No timers set!";
 
             await ic.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AddEmbed(eb.Build()));
+        }
+
+        /// <summary>
+        /// Checks if the given hour and minute are usable to make a datetime object out of them.
+        /// Returns true if the given arguments are usable.
+        /// Returns false if the hour or the minute are not usable.
+        /// </summary>
+        /// <param name="hour">The hour.</param>
+        /// <param name="minute">The minute.</param>
+        /// <returns>A bool.</returns>
+        public static bool TimeFormat(double hour, double minute)
+        {
+            bool hourformatisright = false;
+            bool minuteformatisright = false;
+
+            for (int i = 0; i < 24; i++)
+            {
+                if (hour == i)
+                    hourformatisright = true;
+            }
+            if (!hourformatisright)
+                return false;
+
+            for (int i = 0; i < 60; i++)
+            {
+                if (minute == i)
+                    minuteformatisright = true;
+            }
+            if (!minuteformatisright)
+                return false;
+
+            return true;
         }
 
         /// <summary>

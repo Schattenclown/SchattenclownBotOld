@@ -23,8 +23,8 @@ namespace SchattenclownBot
         /// <returns>Nothing</returns>
         static async Task Main()
         {
-            DB_ScTimer dB_Timer = new DB_ScTimer();
-            DB_ScTimer.CreateTable_Timer();
+            DB_ScTimers.CreateTable_ScTimers();
+            DB_ScAlarmClocks.CreateTable_ScAlarmClocks();
 
             dBot = new DiscordBot();
             await dBot.RunAsync();
