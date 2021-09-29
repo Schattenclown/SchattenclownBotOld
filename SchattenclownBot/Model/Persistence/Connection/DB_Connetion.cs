@@ -1,7 +1,11 @@
 ﻿using MySql.Data.MySqlClient;
 using SchattenclownBot.Model.Objects;
 using System;
+using System.Diagnostics;
+using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
+using SchattenclownBot.HelpClasses;
 
 namespace SchattenclownBot.Model.Persistence.Connection
 {
@@ -32,8 +36,11 @@ namespace SchattenclownBot.Model.Persistence.Connection
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"ERROR: SetDB MESSAGE: {ex.Message}");
-                    Thread.Sleep(10);
+                    Console.WriteLine($"{"".PadRight(Console.WindowWidth - 2, '█')}");
+                    Center("DB IS DEAD");
+                    Console.WriteLine($"{"".PadRight(Console.WindowWidth - 2, '█')}");
+                    RestartProgram();
+                    throw new Exception("DB DeaD");
                 }
             } while (connection == null);
 
@@ -52,6 +59,7 @@ namespace SchattenclownBot.Model.Persistence.Connection
                 Console.WriteLine("DEBUG: DB -1");
             CloseDB(connection);
         }
+
         public static MySqlDataReader ExecuteReader(String sql, MySqlConnection connection)
         {
             MySqlCommand sqlCommand = new MySqlCommand(sql, connection);
@@ -60,11 +68,81 @@ namespace SchattenclownBot.Model.Persistence.Connection
                 MySqlDataReader sqlDataReader = sqlCommand.ExecuteReader();
                 return sqlDataReader;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"ERROR: ExecuteReader MESSAGE: {ex.Message}");
-                return null;
+                Console.WriteLine($"{"".PadRight(Console.WindowWidth - 2, '█')}");
+                Center("DB IS DEAD");
+                Console.WriteLine($"{"".PadRight(Console.WindowWidth - 2, '█')}");
+                RestartProgram();
+                throw new Exception("DB DeaD");
             }
+        }
+
+        /// <summary>
+        /// Centers the console.
+        /// </summary>
+        /// <param name="s">The text.</param>
+        static void Center(string s)
+        {
+            try
+            {
+                Console.Write("██");
+                Console.SetCursorPosition((Console.WindowWidth - s.Length) / 2, Console.CursorTop);
+                Console.Write(s);
+                Console.SetCursorPosition((Console.WindowWidth - 4), Console.CursorTop);
+                Console.WriteLine("██");
+            }
+            catch (Exception)
+            {
+                s = "Console to smoll EXC";
+                Console.SetCursorPosition((Console.WindowWidth - s.Length) / 2, Console.CursorTop);
+                Console.Write(s);
+                Console.SetCursorPosition((Console.WindowWidth - 4), Console.CursorTop);
+                Console.WriteLine("██");
+            }
+        }
+
+        /// <summary>
+        /// Restarts the program.
+        /// </summary>
+        private static void RestartProgram()
+        {
+
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"{"".PadRight(Console.WindowWidth - 2, '█')}");
+            Center(" ");
+            Center(@"██████╗ ███████╗███████╗████████╗ █████╗ ██████╗ ████████╗██╗███╗   ██╗ ██████╗ ");
+            Center(@"██╔══██╗██╔════╝██╔════╝╚══██╔══╝██╔══██╗██╔══██╗╚══██╔══╝██║████╗  ██║██╔════╝ ");
+            Center(@"██████╔╝█████╗  ███████╗   ██║   ███████║██████╔╝   ██║   ██║██╔██╗ ██║██║  ███╗");
+            Center(@"██╔══██╗██╔══╝  ╚════██║   ██║   ██╔══██║██╔══██╗   ██║   ██║██║╚██╗██║██║   ██║");
+            Center(@"██║  ██║███████╗███████║   ██║   ██║  ██║██║  ██║   ██║   ██║██║ ╚████║╚██████╔╝");
+            Center(@"╚═╝  ╚═╝╚══════╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝╚═╝  ╚═══╝ ╚═════╝ ");
+            Center(" ");
+            Console.WriteLine($"{"".PadRight(Console.WindowWidth - 2, '█')}");
+            Center("DB IS DEAD");
+            Console.WriteLine($"{"".PadRight(Console.WindowWidth - 2, '█')}");
+
+            // Get file path of current process 
+            var filePath = Assembly.GetExecutingAssembly().Location;
+            var newFilepath = "";
+            //BotDLL.dll
+
+            if (filePath.Contains("Debug"))
+            {
+                filePath = WordCutter.RemoveAfterWord(filePath, "Debug", 0);
+                newFilepath = filePath + "Debug\\netcoreapp3.1\\SchattenclownBot.exe";
+            }
+            else if (filePath.Contains("Release"))
+            {
+                filePath = WordCutter.RemoveAfterWord(filePath, "Release", 0);
+                newFilepath = filePath + "Release\\netcoreapp3.1\\SchattenclownBot.exe";
+            }
+
+            // Start program
+            Process.Start(newFilepath);
+
+            // For all Windows application but typically for Console app.
+            Environment.Exit(0);
         }
     }
 }
