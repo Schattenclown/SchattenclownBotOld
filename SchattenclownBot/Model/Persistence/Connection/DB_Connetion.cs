@@ -138,6 +138,9 @@ namespace SchattenclownBot.Model.Persistence.Connection
                 newFilepath = filePath + "Release\\netcoreapp3.1\\SchattenclownBot.exe";
             }
 
+            Console.WriteLine("Before 120 secound sleep");
+            Thread.Sleep(1000 * 60);
+            Console.WriteLine("After 120 secound sleep");
             // Start program
             Process.Start(newFilepath);
 
