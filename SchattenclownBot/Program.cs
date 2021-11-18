@@ -29,16 +29,16 @@ namespace SchattenclownBot
                 DB_ScAlarmClocks.CreateTable_ScAlarmClocks();
 
                 dBot = new DiscordBot();
-                dBot.RunAsync();
+                await dBot.RunAsync();
 
-                await Task.Delay(1000 * 60 * 60 * 24);
+                /*await Task.Delay(1000 * 60 * 60 * 24);
                 Program p = new Program();
-                p.RestartProgram();
+                await p.RestartProgram();*/
             }
-            catch (Exception)
+            catch
             {
-                Program p = new Program();
-                p.RestartProgram();
+                /*Program p = new Program();
+                await p.RestartProgram();*/
             }
         }
 

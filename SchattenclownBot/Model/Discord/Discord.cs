@@ -187,8 +187,8 @@ namespace SchattenclownBot.Model.Discord
             Console.WriteLine($"Starting with Prefix {prefix}");
             Console.WriteLine($"Starting {Client.CurrentUser.Username}");
 
-            ScTimersRunAsync();
-            ScAlarmClocksRunAsync();
+            await ScTimersRunAsync();
+            await ScAlarmClocksRunAsync();
 
             while (!ShutdownRequest.IsCancellationRequested)
             {
@@ -203,7 +203,7 @@ namespace SchattenclownBot.Model.Discord
         public async Task ScTimersRunAsync()
         {
             scTimers = DB_ScTimers.ReadAll();
-            ScTimersDBRefreshAutoInterval();
+            await ScTimersDBRefreshAutoInterval();
             while (true)
             {
                 DateTime dateTimeNow = DateTime.Now;
@@ -240,7 +240,7 @@ namespace SchattenclownBot.Model.Discord
         public async Task ScAlarmClocksRunAsync()
         {
             scAlarmClocks = DB_ScAlarmClocks.ReadAll();
-            ScTimersDBRefreshAutoInterval();
+            await ScTimersDBRefreshAutoInterval();
 
             while (true)
             {

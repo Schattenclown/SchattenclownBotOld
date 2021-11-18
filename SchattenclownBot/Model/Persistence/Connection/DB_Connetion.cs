@@ -34,13 +34,13 @@ namespace SchattenclownBot.Model.Persistence.Connection
                 {
                     connection.Open();
                 }
-                catch (Exception ex)
+                catch
                 {
-                    Console.WriteLine($"{"".PadRight(Console.WindowWidth - 2, '█')}");
+                    /*Console.WriteLine($"{"".PadRight(Console.WindowWidth - 2, '█')}");
                     Center("DB IS DEAD");
                     Console.WriteLine($"{"".PadRight(Console.WindowWidth - 2, '█')}");
                     RestartProgram();
-                    throw new Exception("DB DeaD");
+                    throw new Exception("DB DeaD");*/
                 }
             } while (connection == null);
 
@@ -68,12 +68,12 @@ namespace SchattenclownBot.Model.Persistence.Connection
                 MySqlDataReader sqlDataReader = sqlCommand.ExecuteReader();
                 return sqlDataReader;
             }
-            catch (Exception)
+            catch
             {
-                Console.WriteLine($"{"".PadRight(Console.WindowWidth - 2, '█')}");
+                /*Console.WriteLine($"{"".PadRight(Console.WindowWidth - 2, '█')}");
                 Center("DB IS DEAD");
                 Console.WriteLine($"{"".PadRight(Console.WindowWidth - 2, '█')}");
-                RestartProgram();
+                RestartProgram();*/
                 throw new Exception("DB DeaD");
             }
         }

@@ -12,7 +12,6 @@
           "DisCatSharp.ApplicationCommands": "9.8.2",
           "DisCatSharp.CommandsNext": "9.8.2",
           "DisCatSharp.Interactivity": "9.8.2",
-          "Extended.Wpf.Toolkit": "4.1.0",
           "MySql.Data": "8.0.26"
         },
         "runtime": {
@@ -100,68 +99,6 @@
           "lib/netstandard2.0/DisCatSharp.Interactivity.dll": {
             "assemblyVersion": "9.8.2.0",
             "fileVersion": "9.8.2.0"
-          }
-        }
-      },
-      "Extended.Wpf.Toolkit/4.1.0": {
-        "runtime": {
-          "lib/net40/Xceed.Wpf.AvalonDock.Themes.Aero.dll": {
-            "assemblyVersion": "4.1.0.0",
-            "fileVersion": "4.1.0.0"
-          },
-          "lib/net40/Xceed.Wpf.AvalonDock.Themes.Metro.dll": {
-            "assemblyVersion": "4.1.0.0",
-            "fileVersion": "4.1.0.0"
-          },
-          "lib/net40/Xceed.Wpf.AvalonDock.Themes.VS2010.dll": {
-            "assemblyVersion": "4.1.0.0",
-            "fileVersion": "4.1.0.0"
-          },
-          "lib/net40/Xceed.Wpf.AvalonDock.dll": {
-            "assemblyVersion": "4.1.0.0",
-            "fileVersion": "4.1.0.0"
-          },
-          "lib/net40/Xceed.Wpf.Toolkit.dll": {
-            "assemblyVersion": "4.1.0.0",
-            "fileVersion": "4.1.0.0"
-          }
-        },
-        "resources": {
-          "lib/net40/cs-CZ/Xceed.Wpf.AvalonDock.resources.dll": {
-            "locale": "cs-CZ"
-          },
-          "lib/net40/de/Xceed.Wpf.AvalonDock.resources.dll": {
-            "locale": "de"
-          },
-          "lib/net40/es/Xceed.Wpf.AvalonDock.resources.dll": {
-            "locale": "es"
-          },
-          "lib/net40/fr/Xceed.Wpf.AvalonDock.resources.dll": {
-            "locale": "fr"
-          },
-          "lib/net40/hu/Xceed.Wpf.AvalonDock.resources.dll": {
-            "locale": "hu"
-          },
-          "lib/net40/it/Xceed.Wpf.AvalonDock.resources.dll": {
-            "locale": "it"
-          },
-          "lib/net40/ja-JP/Xceed.Wpf.AvalonDock.resources.dll": {
-            "locale": "ja-JP"
-          },
-          "lib/net40/pt-BR/Xceed.Wpf.AvalonDock.resources.dll": {
-            "locale": "pt-BR"
-          },
-          "lib/net40/ro/Xceed.Wpf.AvalonDock.resources.dll": {
-            "locale": "ro"
-          },
-          "lib/net40/ru/Xceed.Wpf.AvalonDock.resources.dll": {
-            "locale": "ru"
-          },
-          "lib/net40/sv/Xceed.Wpf.AvalonDock.resources.dll": {
-            "locale": "sv"
-          },
-          "lib/net40/zh-Hans/Xceed.Wpf.AvalonDock.resources.dll": {
-            "locale": "zh-Hans"
           }
         }
       },
@@ -1030,13 +967,6 @@
       "sha512": "sha512-cO7DOHCjfvgUqySqPAMK3O5nIP6du2TIlkPS6LPv90qpmkI32FSiKUac1dkMavX8AYnfFz9nQSPUhF99tpsQfg==",
       "path": "discatsharp.interactivity/9.8.2",
       "hashPath": "discatsharp.interactivity.9.8.2.nupkg.sha512"
-    },
-    "Extended.Wpf.Toolkit/4.1.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-wXyuHE2ut8OIDUgi1dfyX1qVDQClc4ARmM9yfB0MAshudfaWhtXedWR34zSCIN2gu7CPzE3+u9iLvBv5uBxROg==",
-      "path": "extended.wpf.toolkit/4.1.0",
-      "hashPath": "extended.wpf.toolkit.4.1.0.nupkg.sha512"
     },
     "Google.Protobuf/3.14.0": {
       "type": "package",
